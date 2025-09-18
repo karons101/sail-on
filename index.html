@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yellow>Sail</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23F1C40F' d='M20 70 L50 40 L80 70 H20 Z M50 40 L50 20 L40 30 Z M50 40 L50 20 L60 30 Z M20 70 L80 70 L70 80 L30 80 Z'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    
+    <div id="landing-page" class="app-container">
+        <h1>Yellow>Sail</h1>
+        <svg class="ship-logo" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="sunGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#f39c12;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#f1c40f;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="seaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#2980b9;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#3498db;stop-opacity:1" />
+                </linearGradient>
+                <filter id="shadow">
+                    <feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.4" />
+                </filter>
+            </defs>
+            <circle cx="270" cy="30" r="20" fill="url(#sunGradient)" filter="url(#shadow)" />
+            <path d="M0 65 C50 85, 100 55, 150 75 C200 95, 250 55, 300 75 V100 H0 Z" fill="url(#seaGradient)" />
+            <path d="M40 70 Q75 90, 110 70 L110 75 Q75 95, 40 75 L40 70 Z" fill="#f1c40f" filter="url(#shadow)" />
+            <path d="M75 70 L75 30 L55 40 Z" fill="#fffacd" stroke="#f1c40f" stroke-width="2" filter="url(#shadow)" />
+            <path d="M75 70 L75 30 L95 40 Z" fill="#fffacd" stroke="#f1c40f" stroke-width="2" filter="url(#shadow)" />
+            <line x1="75" y1="70" x2="75" y2="30" stroke="#f1c40f" stroke-width="3" />
+        </svg>
+        <p class="landing-text">Enjoy Free Music, Videos & social entertainment.</p>
+        <div class="demo-section">
+            <video id="backgroundVideo" muted src="assets/beauty_nature.mp4"></video>
+        </div>
+        <button id="cta-get-started" class="access-btn">Get Started</button>
+    </div>
+
+    <div id="mainAppView" class="hidden">
+        <header>
+            <nav class="main-tabs">
+                <button id="publicFeedTab" class="tab-button active">Public Feed</button>
+                <button id="profileTab" class="tab-button">Profile</button>
+                <button id="chatTab" class="tab-button">Chat</button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section id="publicFeedView" class="tab-view">
+                <h2>Public Feed</h2>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <img src="https://via.placeholder.com/300x200" alt="Video Thumbnail">
+                        <div class="content-info">
+                            <h4>Featured Video Title</h4>
+                            <div class="social-actions">
+                                <button class="like-btn"><i class="fa-solid fa-heart"></i> <span>25</span></button>
+                                <button class="share-btn"><i class="fa-solid fa-share-alt"></i></button>
+                                <button class="comment-btn"><i class="fa-solid fa-comment"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="profileView" class="tab-view hidden">
+                <div class="user-profile">
+                    <div class="profile-header">
+                        <img id="user-avatar" src="assets/user-avatar.png" alt="User Avatar" class="avatar">
+                        <h2 id="user-name">Hello, User!</h2>
+                    </div>
+                    <div class="profile-actions">
+                        <input type="file" id="media-upload-input" accept="video/*,audio/*" class="hidden">
+                        <button id="upload-media-btn" class="action-btn">
+                            <i class="fa-solid fa-upload"></i> Upload Media
+                        </button>
+                        <p class="upload-note">Videos & Music in one place!</p>
+                    </div>
+                </div>
+
+                <div class="user-library">
+                    <h3>My Library</h3>
+                    <div class="content-grid" id="user-media-grid">
+                        <div class="content-card">
+                            <img src="https://via.placeholder.com/300x200" alt="My Video Thumbnail">
+                            <div class="content-info">
+                                <h4>My Uploaded Video</h4>
+                                <div class="social-actions">
+                                    <button class="like-btn"><i class="fa-solid fa-heart"></i> <span>5</span></button>
+                                    <button class="share-btn"><i class="fa-solid fa-share-alt"></i></button>
+                                    <button class="comment-btn"><i class="fa-solid fa-comment"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="chatView" class="tab-view hidden">
+                <h2>Chat</h2>
+                <div class="chat-container">
+                    <div class="chat-log">
+                        <div class="message received">
+                            <p>Hi there! Welcome to the chat.</p>
+                        </div>
+                        <div class="message sent">
+                            <p>Hey, glad to be here!</p>
+                        </div>
+                    </div>
+                    <form class="chat-input-form">
+                        <input type="text" placeholder="Type a message..." required>
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content">
+            <button id="closeModalBtn" class="modal-close-btn">&times;</button>
+            <h2 class="modal-heading">Welcome to Yellow>Sail</h2>
+            <div class="auth-tabs">
+                <button id="loginTab" class="auth-tab active">Log In</button>
+                <button id="signupTab" class="auth-tab">Sign Up</button>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" id="rememberMe"> Remember Me
+                    </label>
+                    <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+                </div>
+                <button type="submit" class="auth-submit-btn">Log In</button>
+            </form>
+            <form id="signupForm" class="auth-form hidden">
+                <input type="email" id="signupEmail" placeholder="Email" required>
+                <input type="password" id="signupPassword" placeholder="Password" required>
+                <button type="submit" class="auth-submit-btn">Sign Up</button>
+            </form>
+            <button id="anonymousSignInBtn" class="anonymous-btn">Sign In Anonymously</button>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
