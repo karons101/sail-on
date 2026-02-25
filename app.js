@@ -221,14 +221,55 @@ document.addEventListener('DOMContentLoaded', () => {
         mediaUploadInput.value = '';
     });
 
-    // ================= GLOBAL SEARCH (MVP READY) =================
-    globalSearch?.addEventListener('keydown', e => {
-        if (e.key === 'Enter') {
-            const query = globalSearch.value.trim();
-            if (!query) return;
+    // ================= REAL GLOBAL SEARCH ENGINE =================
+const performSearch = (query) => {
+    const cards = document.querySelectorAll('.content-card');
+    const q = query.toLowerCase();
 
-            alert(`Search coming soon: "${query}"`);
+    cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        const media = card.querySelector('video, img, audio');
+
+        const match =
+            text.includes(q) ||
+            media?.src?.toLowerCase().includes(q);
+
+        if (match) {
+            card.style.display = '';
+            card.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        } else {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => (card.style.display = 'none'), 150);
         }
     });
+};
+
+// Live typing search (premium UX)
+globalSearch?.addEventListener('input', () => {
+    const query = globalSearch.value.trim();
+
+    if (!query) {
+        document.querySelectorAll('.content-card').forEach(card => {
+            card.style.display = '';
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 50);
+        });
+        return;
+    }
+
+    performSearch(query);
+});
+
+// Enter key = focus public feed
+globalSearch?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        switchMainTab('publicFeedView');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+});
 
 });
