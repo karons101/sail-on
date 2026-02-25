@@ -1,9 +1,8 @@
-// --- All logic inside ONE DOMContentLoaded ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- DOM queries (ALL TOGETHER AT THE TOP) ---
+    // --- DOM Queries ---
     const landingPage = document.getElementById('landing-page');
-    const backgroundVideo = document.getElementById('backgroundVideo');
+    const demoSection = document.querySelector('.demo-section');
     const ctaGetStartedBtn = document.getElementById('cta-get-started');
     const mainAppView = document.getElementById('mainAppView');
     const authModal = document.getElementById('authModal');
@@ -13,54 +12,87 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginTab = document.getElementById('loginTab');
     const signupTab = document.getElementById('signupTab');
     const anonymousSignInBtn = document.getElementById('anonymousSignInBtn');
+
     const publicFeedTab = document.getElementById('publicFeedTab');
     const profileTab = document.getElementById('profileTab');
     const chatTab = document.getElementById('chatTab');
+
     const publicFeedView = document.getElementById('publicFeedView');
     const profileView = document.getElementById('profileView');
     const chatView = document.getElementById('chatView');
 
-    // --- Video Playlist Logic ---
-    const videoPlaylist = [
+    const avatarInput = document.getElementById('avatarInput');
+    const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+
+    const mediaUploadInput = document.getElementById('mediaUploadInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    const userMediaGrid = document.getElementById('user-media-grid');
+    const uploadPreview = document.getElementById('uploadPreview');
+    const userAvatar = document.getElementById('user-avatar');
+
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+
+    const appLogo = document.querySelector('.app-logo');
+    const globalSearch = document.querySelector('.global-search');
+
+    // ================= VIDEO BACKGROUND PLAYLIST =================
+    const videoSources = [
         'assets/beauty_nature.mp4',
         'assets/nature.mp4',
         'assets/music_video.mp4'
     ];
-    let currentVideoIndex = 0;
-    
-    function playNextVideo() {
-        if (backgroundVideo && videoPlaylist.length > 0) {
-            backgroundVideo.src = videoPlaylist[currentVideoIndex];
-            backgroundVideo.load();
-            backgroundVideo.play().catch(e => {
-                console.error("Video autoplay failed:", e);
+
+    const videoElements = [];
+    let currentIndex = 0;
+
+    if (demoSection) {
+        videoSources.forEach((src, i) => {
+            const video = document.createElement('video');
+            video.src = src;
+            video.autoplay = true;
+            video.muted = true;
+            video.loop = true;
+            video.playsInline = true;
+            video.preload = "auto";
+
+            Object.assign(video.style, {
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transform: 'translate(-50%, -50%)',
+                opacity: i === 0 ? '1' : '0',
+                transition: 'opacity 1.5s ease',
+                filter: 'brightness(1.15)',
+                zIndex: 0
             });
-        }
-    }
-    
-    if (backgroundVideo) {
-        backgroundVideo.addEventListener('ended', () => {
-            currentVideoIndex++;
-            if (currentVideoIndex >= videoPlaylist.length) {
-                currentVideoIndex = 0;
-            }
-            playNextVideo();
+
+            demoSection.appendChild(video);
+            videoElements.push(video);
         });
-        
-        // Start the playlist when the page loads
-        playNextVideo();
+
+        function fadeNextVideo() {
+            const current = videoElements[currentIndex];
+            const nextIndex = (currentIndex + 1) % videoElements.length;
+            const next = videoElements[nextIndex];
+
+            next.style.opacity = '1';
+            current.style.opacity = '0';
+            currentIndex = nextIndex;
+        }
+
+        setInterval(fadeNextVideo, 8000);
     }
 
-    // --- Modal Logic ---
-    const showModal = () => {
-        authModal.classList.remove('hidden');
-    };
-    
-    const hideModal = () => {
-        authModal.classList.add('hidden');
-    };
+    // ================= MODAL =================
+    const showModal = () => authModal.classList.remove('hidden');
+    const hideModal = () => authModal.classList.add('hidden');
 
-    // --- Tab Switching Logic for Auth Modal ---
     const switchAuthTab = (tab) => {
         if (tab === 'login') {
             loginForm.classList.remove('hidden');
@@ -75,80 +107,128 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Function to transition from landing to main app view ---
     const showMainApp = () => {
         landingPage.classList.add('hidden');
         mainAppView.classList.remove('hidden');
-        if (backgroundVideo) {
-            backgroundVideo.pause();
-        }
-        hideModal(); // Hide the modal after a successful action
-        console.log("Welcome to YellowSail!");
+        hideModal();
+        window.scrollTo(0, 0);
     };
-    
-    // --- Event Listeners ---
-    if (ctaGetStartedBtn) {
-        ctaGetStartedBtn.addEventListener('click', showModal);
-    }
 
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', hideModal);
-    }
-    
-    if (loginTab) loginTab.addEventListener('click', () => switchAuthTab('login'));
-    if (signupTab) signupTab.addEventListener('click', () => switchAuthTab('signup'));
+    // ================= EVENTS =================
+    ctaGetStartedBtn?.addEventListener('click', showModal);
+    closeModalBtn?.addEventListener('click', hideModal);
+    loginTab?.addEventListener('click', () => switchAuthTab('login'));
+    signupTab?.addEventListener('click', () => switchAuthTab('signup'));
 
-    // The 'Remember Me' and 'Forgot Password' links don't need JavaScript for now,
-    // as they will be implemented when we add Firebase Authentication.
-    
-    // Temporary logic for auth buttons without Firebase
-    if (loginForm) loginForm.addEventListener('submit', (e) => {
+    loginForm?.addEventListener('submit', e => {
         e.preventDefault();
         showMainApp();
-        console.log("Login form submitted (No Firebase).");
     });
 
-    if (signupForm) signupForm.addEventListener('submit', (e) => {
+    signupForm?.addEventListener('submit', e => {
         e.preventDefault();
         showMainApp();
-        console.log("Signup form submitted (No Firebase).");
-    });
-    
-    if (anonymousSignInBtn) anonymousSignInBtn.addEventListener('click', () => {
-        showMainApp();
-        console.log("Signed in anonymously (No Firebase).");
     });
 
-    // --- Main App Tab Switching Logic ---
-    function switchMainTab(viewId) {
-        const tabs = {
-            'publicFeedView': publicFeedTab,
-            'profileView': profileTab,
-            'chatView': chatTab
-        };
-    
-        const views = [publicFeedView, profileView, chatView];
-        views.forEach(view => {
-            view.classList.add('hidden');
-        });
-    
-        document.getElementById(viewId).classList.remove('hidden');
-    
-        for (const id in tabs) {
-            if (tabs[id]) {
-                tabs[id].classList.remove('active');
-            }
-        }
-        
-        if (tabs[viewId]) {
-            tabs[viewId].classList.add('active');
-        }
-    }
-    
-    if (publicFeedTab) publicFeedTab.addEventListener('click', () => switchMainTab('publicFeedView'));
-    if (profileTab) profileTab.addEventListener('click', () => switchMainTab('profileView'));
-    if (chatTab) chatTab.addEventListener('click', () => switchMainTab('chatView'));
-    
-    // Initial tab setup
+    anonymousSignInBtn?.addEventListener('click', showMainApp);
+
+    // ================= SIDE MENU =================
+    const toggleMenu = () => {
+        sideMenu.classList.toggle('active');
+        menuOverlay.classList.toggle('active');
+        hamburgerBtn.classList.toggle('open');
+    };
+
+    hamburgerBtn?.addEventListener('click', toggleMenu);
+    menuOverlay?.addEventListener('click', toggleMenu);
+
+    document.querySelectorAll('#sideMenu button').forEach(btn => {
+        btn.addEventListener('click', toggleMenu);
+    });
+
+    // ================= TABS =================
+    const switchMainTab = (viewId) => {
+        [publicFeedView, profileView, chatView].forEach(v => v.classList.add('hidden'));
+        document.getElementById(viewId)?.classList.remove('hidden');
+
+        [publicFeedTab, profileTab, chatTab].forEach(t => t.classList.remove('active'));
+
+        if (viewId === 'publicFeedView') publicFeedTab.classList.add('active');
+        if (viewId === 'profileView') profileTab.classList.add('active');
+        if (viewId === 'chatView') chatTab.classList.add('active');
+    };
+
+    publicFeedTab?.addEventListener('click', () => switchMainTab('publicFeedView'));
+    profileTab?.addEventListener('click', () => switchMainTab('profileView'));
+    chatTab?.addEventListener('click', () => switchMainTab('chatView'));
+
     switchMainTab('publicFeedView');
+
+    // ================= LOGO CLICK = HOME =================
+    appLogo?.addEventListener('click', () => {
+        mainAppView.classList.add('hidden');
+        landingPage.classList.remove('hidden');
+        window.scrollTo(0, 0);
+    });
+
+    // ================= AVATAR UPLOAD =================
+    changeAvatarBtn?.addEventListener('click', () => avatarInput.click());
+
+    avatarInput?.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        userAvatar.src = url;
+        uploadPreview.src = url;
+        uploadPreview.style.display = 'block';
+    });
+
+    // ================= MEDIA UPLOAD =================
+    uploadBtn?.addEventListener('click', () => mediaUploadInput.click());
+
+    mediaUploadInput?.addEventListener('change', e => {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        files.forEach(file => {
+            const url = URL.createObjectURL(file);
+
+            const card = document.createElement('div');
+            card.className = 'content-card';
+
+            let media;
+
+            if (file.type.startsWith('image')) {
+                media = document.createElement('img');
+                media.src = url;
+            } else if (file.type.startsWith('video')) {
+                media = document.createElement('video');
+                media.src = url;
+                media.controls = true;
+            } else {
+                media = document.createElement('audio');
+                media.src = url;
+                media.controls = true;
+            }
+
+            media.style.width = '100%';
+            media.style.borderRadius = '10px';
+            card.appendChild(media);
+            userMediaGrid.prepend(card);
+        });
+
+        mediaUploadInput.value = '';
+    });
+
+    // ================= GLOBAL SEARCH (MVP READY) =================
+    globalSearch?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const query = globalSearch.value.trim();
+            if (!query) return;
+
+            alert(`Search coming soon: "${query}"`);
+        }
+    });
+
 });
