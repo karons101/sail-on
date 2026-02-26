@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appLogo = document.querySelector('.app-logo');
     const globalSearch = document.querySelector('.global-search');
 
-    // ================= VIDEO BACKGROUND PLAYLIST =================
+    // ================= VIDEO BACKGROUND =================
     const videoSources = [
         'assets/beauty_nature.mp4',
         'assets/nature.mp4',
@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
             video.muted = true;
             video.loop = true;
             video.playsInline = true;
-            video.preload = "auto";
 
             Object.assign(video.style, {
                 position: 'absolute',
@@ -76,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             videoElements.push(video);
         });
 
-        function fadeNextVideo() {
+        setInterval(() => {
             const current = videoElements[currentIndex];
             const nextIndex = (currentIndex + 1) % videoElements.length;
             const next = videoElements[nextIndex];
@@ -84,9 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             next.style.opacity = '1';
             current.style.opacity = '0';
             currentIndex = nextIndex;
-        }
-
-        setInterval(fadeNextVideo, 8000);
+        }, 8000);
     }
 
     // ================= MODAL =================
@@ -120,19 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
     loginTab?.addEventListener('click', () => switchAuthTab('login'));
     signupTab?.addEventListener('click', () => switchAuthTab('signup'));
 
-    loginForm?.addEventListener('submit', e => {
-        e.preventDefault();
-        showMainApp();
-    });
-
-    signupForm?.addEventListener('submit', e => {
-        e.preventDefault();
-        showMainApp();
-    });
-
+    loginForm?.addEventListener('submit', e => { e.preventDefault(); showMainApp(); });
+    signupForm?.addEventListener('submit', e => { e.preventDefault(); showMainApp(); });
     anonymousSignInBtn?.addEventListener('click', showMainApp);
 
-    // ================= SIDE MENU =================
+    // ================= MENU =================
     const toggleMenu = () => {
         sideMenu.classList.toggle('active');
         menuOverlay.classList.toggle('active');
@@ -141,10 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hamburgerBtn?.addEventListener('click', toggleMenu);
     menuOverlay?.addEventListener('click', toggleMenu);
-
-    document.querySelectorAll('#sideMenu button').forEach(btn => {
-        btn.addEventListener('click', toggleMenu);
-    });
 
     // ================= TABS =================
     const switchMainTab = (viewId) => {
@@ -164,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switchMainTab('publicFeedView');
 
-    // ================= LOGO CLICK = HOME =================
+    // ================= LOGO HOME =================
     appLogo?.addEventListener('click', () => {
         mainAppView.classList.add('hidden');
         landingPage.classList.remove('hidden');
@@ -193,27 +178,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         files.forEach(file => {
             const url = URL.createObjectURL(file);
-
             const card = document.createElement('div');
             card.className = 'content-card';
 
             let media;
-
             if (file.type.startsWith('image')) {
                 media = document.createElement('img');
-                media.src = url;
             } else if (file.type.startsWith('video')) {
                 media = document.createElement('video');
-                media.src = url;
                 media.controls = true;
             } else {
                 media = document.createElement('audio');
-                media.src = url;
                 media.controls = true;
             }
 
+            media.src = url;
             media.style.width = '100%';
             media.style.borderRadius = '10px';
+
             card.appendChild(media);
             userMediaGrid.prepend(card);
         });
@@ -221,55 +203,54 @@ document.addEventListener('DOMContentLoaded', () => {
         mediaUploadInput.value = '';
     });
 
-    // ================= REAL GLOBAL SEARCH ENGINE =================
-const performSearch = (query) => {
-    const cards = document.querySelectorAll('.content-card');
-    const q = query.toLowerCase();
-
-    cards.forEach(card => {
-        const text = card.innerText.toLowerCase();
-        const media = card.querySelector('video, img, audio');
-
-        const match =
-            text.includes(q) ||
-            media?.src?.toLowerCase().includes(q);
-
-        if (match) {
+    // ================= REAL SEARCH ENGINE (FIXED) =================
+    const resetCards = () => {
+        document.querySelectorAll('.content-card').forEach(card => {
             card.style.display = '';
             card.style.opacity = '1';
             card.style.transform = 'scale(1)';
-        } else {
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.95)';
-            setTimeout(() => (card.style.display = 'none'), 150);
-        }
-    });
-};
+        });
+    };
 
-// Live typing search (premium UX)
-globalSearch?.addEventListener('input', () => {
-    const query = globalSearch.value.trim();
-
-    if (!query) {
+    const performSearch = (query) => {
+        const q = query.toLowerCase();
         document.querySelectorAll('.content-card').forEach(card => {
-            card.style.display = '';
-            setTimeout(() => {
+            const text = card.innerText.toLowerCase();
+            const media = card.querySelector('video, img, audio');
+            const src = media?.src?.toLowerCase() || '';
+
+            const match = text.includes(q) || src.includes(q);
+
+            if (match) {
+                card.style.display = '';
                 card.style.opacity = '1';
                 card.style.transform = 'scale(1)';
-            }, 50);
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => (card.style.display = 'none'), 120);
+            }
         });
-        return;
-    }
+    };
 
-    performSearch(query);
-});
+    // Live typing search
+    globalSearch?.addEventListener('input', () => {
+        const query = globalSearch.value.trim();
+        if (!query) {
+            resetCards();
+            return;
+        }
+        performSearch(query);
+    });
 
-// Enter key = focus public feed
-globalSearch?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-        switchMainTab('publicFeedView');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-});
+    // Enter key → open feed safely
+    globalSearch?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            const query = globalSearch.value.trim();
+            switchMainTab('publicFeedView');
+            if (!query) resetCards();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
 
 });
