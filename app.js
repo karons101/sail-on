@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const appLogo = document.querySelector('.app-logo');
     const globalSearch = document.querySelector('.global-search');
 
-    // ================= VIDEO BACKGROUND =================
+    // ================= VIDEO BACKGROUND PLAYLIST =================
     const videoSources = [
         'assets/beauty_nature.mp4',
         'assets/nature.mp4',
@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             video.muted = true;
             video.loop = true;
             video.playsInline = true;
+            video.preload = "auto";
 
             Object.assign(video.style, {
                 position: 'absolute',
@@ -121,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     signupForm?.addEventListener('submit', e => { e.preventDefault(); showMainApp(); });
     anonymousSignInBtn?.addEventListener('click', showMainApp);
 
-    // ================= MENU =================
+    // ================= SIDE MENU =================
     const toggleMenu = () => {
         sideMenu.classList.toggle('active');
         menuOverlay.classList.toggle('active');
@@ -130,6 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     hamburgerBtn?.addEventListener('click', toggleMenu);
     menuOverlay?.addEventListener('click', toggleMenu);
+
+    // FIXED: close menu when clicking menu buttons
+    document.querySelectorAll('#sideMenu button').forEach(btn => {
+        btn.addEventListener('click', toggleMenu);
+    });
 
     // ================= TABS =================
     const switchMainTab = (viewId) => {
@@ -149,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switchMainTab('publicFeedView');
 
-    // ================= LOGO HOME =================
+    // ================= LOGO CLICK = HOME =================
     appLogo?.addEventListener('click', () => {
         mainAppView.classList.add('hidden');
         landingPage.classList.remove('hidden');
@@ -203,9 +209,11 @@ document.addEventListener('DOMContentLoaded', () => {
         mediaUploadInput.value = '';
     });
 
-    // ================= REAL SEARCH ENGINE (FIXED) =================
+    // ================= STABLE SEARCH ENGINE =================
+    const getAllCards = () => document.querySelectorAll('.content-card');
+
     const resetCards = () => {
-        document.querySelectorAll('.content-card').forEach(card => {
+        getAllCards().forEach(card => {
             card.style.display = '';
             card.style.opacity = '1';
             card.style.transform = 'scale(1)';
@@ -214,7 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const performSearch = (query) => {
         const q = query.toLowerCase();
-        document.querySelectorAll('.content-card').forEach(card => {
+
+        getAllCards().forEach(card => {
             const text = card.innerText.toLowerCase();
             const media = card.querySelector('video, img, audio');
             const src = media?.src?.toLowerCase() || '';
@@ -226,29 +235,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.style.opacity = '1';
                 card.style.transform = 'scale(1)';
             } else {
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.95)';
-                setTimeout(() => (card.style.display = 'none'), 120);
+                card.style.display = 'none';
             }
         });
     };
 
-    // Live typing search
     globalSearch?.addEventListener('input', () => {
         const query = globalSearch.value.trim();
         if (!query) {
             resetCards();
-            return;
+        } else {
+            performSearch(query);
         }
-        performSearch(query);
     });
 
-    // Enter key → open feed safely
     globalSearch?.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
             const query = globalSearch.value.trim();
             switchMainTab('publicFeedView');
+
             if (!query) resetCards();
+            else performSearch(query);
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
