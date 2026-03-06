@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const globalSearch = document.querySelector('.global-search');
 
     // ================= VIDEO BACKGROUND PLAYLIST =================
+
     const videoSources = [
         'assets/beauty_nature.mp4',
         'assets/nature.mp4',
@@ -49,8 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentIndex = 0;
 
     if (demoSection) {
+
         videoSources.forEach((src, i) => {
+
             const video = document.createElement('video');
+
             video.src = src;
             video.autoplay = true;
             video.muted = true;
@@ -77,53 +81,78 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         setInterval(() => {
+
             const current = videoElements[currentIndex];
             const nextIndex = (currentIndex + 1) % videoElements.length;
             const next = videoElements[nextIndex];
 
             next.style.opacity = '1';
             current.style.opacity = '0';
+
             currentIndex = nextIndex;
+
         }, 8000);
     }
 
     // ================= MODAL =================
+
     const showModal = () => authModal.classList.remove('hidden');
     const hideModal = () => authModal.classList.add('hidden');
 
     const switchAuthTab = (tab) => {
+
         if (tab === 'login') {
+
             loginForm.classList.remove('hidden');
             signupForm.classList.add('hidden');
+
             loginTab.classList.add('active');
             signupTab.classList.remove('active');
+
         } else {
+
             signupForm.classList.remove('hidden');
             loginForm.classList.add('hidden');
+
             signupTab.classList.add('active');
             loginTab.classList.remove('active');
         }
     };
 
     const showMainApp = () => {
+
         landingPage.classList.add('hidden');
         mainAppView.classList.remove('hidden');
+
         hideModal();
+
         window.scrollTo(0, 0);
     };
 
     // ================= EVENTS =================
+
     ctaGetStartedBtn?.addEventListener('click', showModal);
     closeModalBtn?.addEventListener('click', hideModal);
+
     loginTab?.addEventListener('click', () => switchAuthTab('login'));
     signupTab?.addEventListener('click', () => switchAuthTab('signup'));
 
-    loginForm?.addEventListener('submit', e => { e.preventDefault(); showMainApp(); });
-    signupForm?.addEventListener('submit', e => { e.preventDefault(); showMainApp(); });
+    loginForm?.addEventListener('submit', e => {
+        e.preventDefault();
+        showMainApp();
+    });
+
+    signupForm?.addEventListener('submit', e => {
+        e.preventDefault();
+        showMainApp();
+    });
+
     anonymousSignInBtn?.addEventListener('click', showMainApp);
 
     // ================= SIDE MENU =================
+
     const toggleMenu = () => {
+
         sideMenu.classList.toggle('active');
         menuOverlay.classList.toggle('active');
         hamburgerBtn.classList.toggle('open');
@@ -132,14 +161,16 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburgerBtn?.addEventListener('click', toggleMenu);
     menuOverlay?.addEventListener('click', toggleMenu);
 
-    // FIXED: close menu when clicking menu buttons
     document.querySelectorAll('#sideMenu button').forEach(btn => {
         btn.addEventListener('click', toggleMenu);
     });
 
     // ================= TABS =================
+
     const switchMainTab = (viewId) => {
+
         [publicFeedView, profileView, chatView].forEach(v => v.classList.add('hidden'));
+
         document.getElementById(viewId)?.classList.remove('hidden');
 
         [publicFeedTab, profileTab, chatTab].forEach(t => t.classList.remove('active'));
@@ -147,6 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (viewId === 'publicFeedView') publicFeedTab.classList.add('active');
         if (viewId === 'profileView') profileTab.classList.add('active');
         if (viewId === 'chatView') chatTab.classList.add('active');
+
+        // reset cards when switching views
+        resetCards();
     };
 
     publicFeedTab?.addEventListener('click', () => switchMainTab('publicFeedView'));
@@ -155,45 +189,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switchMainTab('publicFeedView');
 
-    // ================= LOGO CLICK = HOME =================
+    // ================= LOGO CLICK =================
+
     appLogo?.addEventListener('click', () => {
+
         mainAppView.classList.add('hidden');
         landingPage.classList.remove('hidden');
+
         window.scrollTo(0, 0);
     });
 
     // ================= AVATAR UPLOAD =================
+
     changeAvatarBtn?.addEventListener('click', () => avatarInput.click());
 
     avatarInput?.addEventListener('change', e => {
+
         const file = e.target.files[0];
         if (!file) return;
 
         const url = URL.createObjectURL(file);
+
         userAvatar.src = url;
         uploadPreview.src = url;
+
         uploadPreview.style.display = 'block';
     });
 
     // ================= MEDIA UPLOAD =================
+
     uploadBtn?.addEventListener('click', () => mediaUploadInput.click());
 
     mediaUploadInput?.addEventListener('change', e => {
+
         const files = Array.from(e.target.files);
+
         if (!files.length) return;
 
         files.forEach(file => {
+
             const url = URL.createObjectURL(file);
+
             const card = document.createElement('div');
             card.className = 'content-card';
 
             let media;
+
             if (file.type.startsWith('image')) {
+
                 media = document.createElement('img');
+
             } else if (file.type.startsWith('video')) {
+
                 media = document.createElement('video');
                 media.controls = true;
+
             } else {
+
                 media = document.createElement('audio');
                 media.controls = true;
             }
@@ -203,17 +255,21 @@ document.addEventListener('DOMContentLoaded', () => {
             media.style.borderRadius = '10px';
 
             card.appendChild(media);
+
             userMediaGrid.prepend(card);
         });
 
         mediaUploadInput.value = '';
     });
 
-    // ================= STABLE SEARCH ENGINE =================
-    const getAllCards = () => document.querySelectorAll('.content-card');
+    // ================= SEARCH ENGINE =================
+
+    const getAllCards = () => publicFeedView.querySelectorAll('.content-card');
 
     const resetCards = () => {
+
         getAllCards().forEach(card => {
+
             card.style.display = '';
             card.style.opacity = '1';
             card.style.transform = 'scale(1)';
@@ -221,43 +277,66 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const performSearch = (query) => {
+
         const q = query.toLowerCase();
 
         getAllCards().forEach(card => {
-            const text = card.innerText.toLowerCase();
+
+            const text = card.textContent.toLowerCase();
+
             const media = card.querySelector('video, img, audio');
+
             const src = media?.src?.toLowerCase() || '';
 
-            const match = text.includes(q) || src.includes(q);
+            const match =
+                text.includes(q) ||
+                src.includes(q);
 
             if (match) {
+
                 card.style.display = '';
                 card.style.opacity = '1';
                 card.style.transform = 'scale(1)';
+
             } else {
+
                 card.style.display = 'none';
             }
         });
     };
 
     globalSearch?.addEventListener('input', () => {
+
         const query = globalSearch.value.trim();
+
         if (!query) {
+
             resetCards();
+
         } else {
+
             performSearch(query);
         }
     });
 
     globalSearch?.addEventListener('keydown', e => {
+
         if (e.key === 'Enter') {
+
             const query = globalSearch.value.trim();
+
             switchMainTab('publicFeedView');
 
-            if (!query) resetCards();
-            else performSearch(query);
+            if (!query) {
+                resetCards();
+            } else {
+                performSearch(query);
+            }
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
     });
 
